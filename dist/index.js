@@ -1691,6 +1691,7 @@ const github = __importStar(__webpack_require__(469));
 const fs = __importStar(__webpack_require__(747));
 const path = __importStar(__webpack_require__(622));
 const node_fetch_1 = __importDefault(__webpack_require__(454));
+const https_1 = __importDefault(__webpack_require__(211));
 const ARCH = process.env.ARCH || 'linux';
 const githubToken = core.getInput('github-token');
 core.info(githubToken);
@@ -1743,10 +1744,14 @@ function getApps() {
         core.info(`Fetching apps from: ${url}`);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let responseJson;
+        const httpsAgent = new https_1.default.Agent({
+            rejectUnauthorized: false
+        });
         try {
             const response = yield node_fetch_1.default(url, {
                 method: 'GET',
-                headers: { Cookie: `argocd.token=${ARGOCD_TOKEN}` }
+                headers: { Cookie: `argocd.token=${ARGOCD_TOKEN}` },
+                agent: httpsAgent
             });
             responseJson = yield response.json();
         }
