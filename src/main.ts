@@ -5,6 +5,7 @@ import * as github from '@actions/github';
 import * as fs from 'fs';
 import * as path from 'path';
 import nodeFetch from 'node-fetch';
+import https from "https";
 
 interface ExecResult {
   err?: Error | undefined;
@@ -88,10 +89,14 @@ async function getApps(): Promise<App[]> {
   core.info(`Fetching apps from: ${url}`);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let responseJson: any;
+  const httpsAgent = new https.Agent({
+    rejectUnauthorized: false
+  });
   try {
     const response = await nodeFetch(url, {
       method: 'GET',
-      headers: { Cookie: `argocd.token=${ARGOCD_TOKEN}` }
+      headers: { Cookie: `argocd.token=${ARGOCD_TOKEN}` },
+      agent: httpsAgent
     });
     responseJson = await response.json();
   } catch (e) {
